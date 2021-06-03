@@ -9,13 +9,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.platzi.android.firestore.R
 import com.platzi.android.firestore.databinding.ActivityLoginBinding
 
-/**
- * @author Santiago Carrillo
- * github sancarbar
- * 1/29/19.
- */
-
-
 const val USERNAME_KEY = "username_key"
 
 class LoginActivity : AppCompatActivity() {

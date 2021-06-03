@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.platzi.android.firestore.R
+import com.platzi.android.firestore.databinding.ActivityLoginBinding
 
 /**
  * @author Santiago Carrillo
@@ -17,20 +19,27 @@ import com.platzi.android.firestore.R
 const val USERNAME_KEY = "username_key"
 
 class LoginActivity : AppCompatActivity() {
-
-
+    private lateinit var bin: ActivityLoginBinding
     private val TAG = "LoginActivity"
-
+    private var auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        bin = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(bin.root)
     }
 
 
     fun onStartClicked(view: View) {
-        startMainActivity("Santiago")
-
+        auth.signInAnonymously()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val username = bin.username.text.toString()
+                    startMainActivity(username)
+                } else {
+                    showErrorMessage(view)
+                }
+            }
     }
 
     private fun showErrorMessage(view: View) {

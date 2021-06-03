@@ -2,9 +2,9 @@ package com.platzi.android.firestore.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.platzi.android.firestore.R
-import kotlinx.android.synthetic.main.activity_trader.*
 
 
 /**
@@ -12,11 +12,12 @@ import kotlinx.android.synthetic.main.activity_trader.*
  * 2/14/19.
  */
 class TraderActivity : AppCompatActivity() {
-
+    private lateinit var fab: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trader)
+         fab = findViewById(R.id.fab)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, getString(R.string.generating_new_cryptos), Snackbar.LENGTH_SHORT)

@@ -39,9 +39,23 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val username = bin.username.text.toString()
-                    val user = User()
-                    user.userName = username
-                    saveUserAndStartActivity(user, view)
+                    firestoreService.findUserById(username, object : Callback<User> {
+
+                        override fun onSuccess(result: User?) {
+                            if (result == null) {
+                                val user = User()
+                                user.userName = username
+                                saveUserAndStartActivity(user, view)
+                            } else {
+                                startMainActivity(username)
+                            }
+                        }
+
+                        override fun onFailed(exception: Exception) {
+                            showErrorMessage(view)
+                        }
+
+                    })
                 } else {
                     showErrorMessage(view)
                     view.isEnabled = true

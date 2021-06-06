@@ -17,6 +17,7 @@ import com.platzi.android.firestore.model.Crypto
 import com.platzi.android.firestore.model.User
 import com.platzi.android.firestore.network.Callback
 import com.platzi.android.firestore.network.FirestoreService
+import com.platzi.android.firestore.network.RealtimeDataListener
 import java.lang.Exception
 
 
@@ -46,8 +47,17 @@ class TraderActivity : AppCompatActivity(), CryptosAdapterListener {
         bin.fab.setOnClickListener { view ->
             Snackbar.make(view, getString(R.string.generating_new_cryptos), Snackbar.LENGTH_SHORT)
                 .setAction("Info", null).show()
+            generateCryptoCurrenciesRandom()
         }
 
+    }
+
+    private fun generateCryptoCurrenciesRandom() {
+        for(crypto in cryptosAdapter.cryptosList) {
+            val amount = (1..10).random()
+            crypto.available += amount
+            firestoreService.updateCrytos(crypto)
+        }
     }
 
     private fun configureRecyclerView() {
@@ -75,6 +85,7 @@ class TraderActivity : AppCompatActivity(), CryptosAdapterListener {
                             firestoreService.updateUser(user!!, null)
                         }
                         loadUserCryptos()
+                        addRealtimeDatabaseListeners(user!!, cryptosList!!)
                     }
 
                     override fun onFailed(exception: Exception) {
@@ -91,6 +102,38 @@ class TraderActivity : AppCompatActivity(), CryptosAdapterListener {
 
             override fun onFailed(exception: Exception) {
                 Log.e("TraderActivity", "Error", exception)
+                showGeneralServerErrorMessage()
+            }
+
+        })
+    }
+
+    private fun addRealtimeDatabaseListeners(user: User, cryptosList: List<Crypto>) {
+        firestoreService.listenForUpdates(user, object : RealtimeDataListener<User>{
+            override fun onDataChange(updatedData: User) {
+                this@TraderActivity.user = updatedData
+                loadUserCryptos()
+            }
+
+            override fun onError(exception: Exception) {
+                showGeneralServerErrorMessage()
+            }
+
+        })
+
+        firestoreService.listenForUpdates(cryptosList, object : RealtimeDataListener<Crypto>{
+            override fun onDataChange(updatedData: Crypto) {
+                var pos = 0
+                for (crypto in cryptosAdapter.cryptosList) {
+                    if (crypto.name == updatedData.name) {
+                        crypto.available = updatedData.available
+                        cryptosAdapter.notifyItemChanged(pos)
+                    }
+                    pos++
+                }
+            }
+
+            override fun onError(exception: Exception) {
                 showGeneralServerErrorMessage()
             }
 
@@ -122,5 +165,16 @@ class TraderActivity : AppCompatActivity(), CryptosAdapterListener {
     }
 
     override fun onBuyCryptoClicked(crypto: Crypto) {
+        if(crypto.available > 0) {
+            for (cryptos in user!!.cryptoList!!) {
+                if (cryptos.name == crypto.name) {
+                    cryptos.available += 1
+                    break
+                }
+            }
+            crypto.available--
+        }
+        firestoreService.updateUser(user!!, null)
+        firestoreService.updateCrytos(crypto)
     }
 }

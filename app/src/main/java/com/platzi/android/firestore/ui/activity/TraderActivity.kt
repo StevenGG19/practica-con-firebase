@@ -1,15 +1,20 @@
 package com.platzi.android.firestore.ui.activity
 
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FirebaseFirestore
 import com.platzi.android.firestore.R
 import com.platzi.android.firestore.adapter.CryptosAdapter
 import com.platzi.android.firestore.adapter.CryptosAdapterListener
 import com.platzi.android.firestore.databinding.ActivityTraderBinding
+import com.platzi.android.firestore.databinding.CoinInfoBinding
 import com.platzi.android.firestore.model.Crypto
+import com.platzi.android.firestore.model.User
 import com.platzi.android.firestore.network.Callback
 import com.platzi.android.firestore.network.FirestoreService
 import java.lang.Exception
@@ -23,6 +28,8 @@ class TraderActivity : AppCompatActivity(), CryptosAdapterListener {
     private lateinit var firestoreService: FirestoreService
     private lateinit var bin: ActivityTraderBinding
     private val cryptosAdapter = CryptosAdapter(this)
+    private var username: String? = null
+    private var user: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +37,9 @@ class TraderActivity : AppCompatActivity(), CryptosAdapterListener {
         setContentView(bin.root)
 
         firestoreService = FirestoreService(FirebaseFirestore.getInstance())
+        username = intent.extras!![USERNAME_KEY].toString()
+        bin.usernameTextView.text = username
+
         configureRecyclerView()
         loadCryptos()
 
@@ -48,17 +58,62 @@ class TraderActivity : AppCompatActivity(), CryptosAdapterListener {
 
     private fun loadCryptos() {
         firestoreService.getCryptos(object : Callback<List<Crypto>> {
-            override fun onSuccess(result: List<Crypto>?) {
+            override fun onSuccess(cryptosList: List<Crypto>?) {
+                firestoreService.findUserById(username!!, object : Callback<User>{
+                    override fun onSuccess(result: User?) {
+                        user = result
+                        if (user!!.cryptoList == null) {
+                            val userCryptos = mutableListOf<Crypto>()
+                            for (crypto in cryptosList!!) {
+                                val cryptoUser = Crypto()
+                                cryptoUser.name = crypto.name
+                                cryptoUser.available = crypto.available
+                                cryptoUser.imageUrl = crypto.imageUrl
+                                userCryptos.add(cryptoUser)
+                            }
+                            user!!.cryptoList = userCryptos
+                            firestoreService.updateUser(user!!, null)
+                        }
+                        loadUserCryptos()
+                    }
+
+                    override fun onFailed(exception: Exception) {
+                        showGeneralServerErrorMessage()
+                    }
+
+                })
+
                 this@TraderActivity.runOnUiThread {
-                    cryptosAdapter.cryptosList = result!!
+                    cryptosAdapter.cryptosList = cryptosList!!
                     cryptosAdapter.notifyDataSetChanged()
                 }
             }
 
             override fun onFailed(exception: Exception) {
+                Log.e("TraderActivity", "Error", exception)
+                showGeneralServerErrorMessage()
             }
 
         })
+    }
+
+    private fun loadUserCryptos() {
+       runOnUiThread {
+           if (user != null && user!!.cryptoList != null) {
+                bin.infoPanel.removeAllViews()
+               for (crypto in user!!.cryptoList!!) {
+                    addUserCrytoInfRow(crypto)
+               }
+           }
+       }
+    }
+
+    private fun addUserCrytoInfRow(crypto: Crypto) {
+        val view = LayoutInflater.from(this).inflate(R.layout.coin_info, bin.infoPanel, false)
+        val binding = CoinInfoBinding.bind(view)
+        binding.coinLabel.text = getString(R.string.coin_info, crypto.name, crypto.available.toString())
+        Glide.with(this).load(crypto.imageUrl).into(binding.coinIcon)
+        bin.infoPanel.addView(view)
     }
 
     fun showGeneralServerErrorMessage() {

@@ -16,7 +16,7 @@ class FirestoreService(val firebaseFirestore: FirebaseFirestore) {
 
     fun updateUser(user: User, callback: Callback<User>?) {
         firebaseFirestore.collection(USERS_COLLECTION_NAME).document(user.userName)
-            .update("cryptosList", user.crytoList)
+            .update("cryptoList", user.cryptoList)
             .addOnSuccessListener { result ->
                 if (result != null) callback!!.onSuccess(user)
             }

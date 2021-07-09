@@ -17,7 +17,6 @@
   <component name="ChangeListManager">
     <list default="true" id="fc5273df-8b95-4613-8060-e59b57253dae" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/platzi/android/firestore/network/FirestoreService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/platzi/android/firestore/network/FirestoreService.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +104,7 @@
     <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../PlatziConf" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
   </component>
   <component name="RunManager">
@@ -203,10 +202,10 @@
       <screen x="0" y="0" width="1360" height="728" />
     </state>
     <state x="257" y="110" key="AndroidCreateResourceFileDialog/0.0.1360.728@0.0.1360.728" timestamp="1622953789394" />
-    <state x="407" y="60" key="FileChooserDialogImpl" timestamp="1622855170456">
+    <state x="407" y="60" key="FileChooserDialogImpl" timestamp="1623370802840">
       <screen x="0" y="0" width="1360" height="728" />
     </state>
-    <state x="407" y="60" key="FileChooserDialogImpl/0.0.1360.728@0.0.1360.728" timestamp="1622855170456" />
+    <state x="407" y="60" key="FileChooserDialogImpl/0.0.1360.728@0.0.1360.728" timestamp="1623370802840" />
     <state width="1305" height="247" key="GridCell.Tab.0.bottom" timestamp="1622957377724">
       <screen x="0" y="0" width="1360" height="728" />
     </state>
